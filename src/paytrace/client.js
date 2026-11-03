@@ -24,7 +24,7 @@ class PayTraceError extends Error {
 
 let cachedToken = null; // { value, expiresAt }
 
-async function getToken() {
+async function getAccessToken() {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 60_000)
     return cachedToken.value;
 
@@ -72,7 +72,7 @@ async function getToken() {
 
 // ---- Request wrapper ---------------------------------------------------------
 
-async function request(method, path, { body, query } = {}, isRetry = false) {
+async function apiRequest(method, path, { body, query } = {}, isRetry = false) {
   const url = new URL(path, config.baseUrl);
   for (const [k, v] of Object.entries(query || {})) {
     if (v !== undefined && v !== null && v !== "")
@@ -80,7 +80,7 @@ async function request(method, path, { body, query } = {}, isRetry = false) {
   }
 
   // Fetched outside the try below: a token failure means the payment was never sent.
-  const token = await getToken();
+  const token = await getAccessToken();
 
   let res;
   try {
@@ -109,7 +109,7 @@ async function request(method, path, { body, query } = {}, isRetry = false) {
   // so one retry with a fresh token is safe.
   if (res.status === 401 && !isRetry) {
     cachedToken = null;
-    return request(method, path, { body, query }, true);
+    return apiRequest(method, path, { body, query }, true);
   }
   if (!res.ok) {
     throw new PayTraceError(`${method} ${path} returned HTTP ${res.status}`, {
@@ -120,4 +120,4 @@ async function request(method, path, { body, query } = {}, isRetry = false) {
   return json.data !== undefined ? json.data : json;
 }
 
-module.exports = { PayTraceError, getToken, request };
+module.exports = { PayTraceError, getAccessToken, apiRequest };

@@ -7,17 +7,17 @@ const step = (name, fn, { needsCustomer } = {}) => steps.push({ name, fn, needsC
 const customerId = process.env.CUSTOMER_ID;
 let authId, saleId;
 
-step('Get token', () => pt.getToken().then(() => 'ok'));
+step('Get token', () => pt.getAccessToken().then(() => 'ok'));
 step('Get Protect clientKey', () => pt.getProtectClientKey().then((k) => `ok (${String(k).slice(0, 8)}…)`));
-step('List voidable', () => pt.listVoidable({ limit: 5 }).then((r) => `ok (${(r.length ?? r?.transactions?.length ?? '?')} rows)`));
+step('List voidable', () => pt.listVoidableTransactions({ limit: 5 }).then((r) => `ok (${(r.length ?? r?.transactions?.length ?? '?')} rows)`));
 step('Authorize saved card $0.50', async () => {
-  const r = await pt.authorizeByCustomer({ customerId, amount: 0.5, invoiceNumber: `SMOKE-A-${Date.now()}` });
-  authId = r.transaction_id; return pt.describe(r);
+  const r = await pt.authorizeSavedCard({ customerId, amount: 0.5, invoiceNumber: `SMOKE-A-${Date.now()}` });
+  authId = r.transaction_id; return pt.describeResult(r);
 }, { needsCustomer: true });
-step('Capture that authorization', async () => JSON.stringify(await pt.capture([authId])), { needsCustomer: true });
+step('Capture that authorization', async () => JSON.stringify(await pt.captureAuthorizations([authId])), { needsCustomer: true });
 step('Sale on saved card $0.50', async () => {
-  const r = await pt.saleByCustomer({ customerId, amount: 0.5, invoiceNumber: `SMOKE-S-${Date.now()}` });
-  saleId = r.transaction_id; return pt.describe(r);
+  const r = await pt.chargeSavedCard({ customerId, amount: 0.5, invoiceNumber: `SMOKE-S-${Date.now()}` });
+  saleId = r.transaction_id; return pt.describeResult(r);
 }, { needsCustomer: true });
 step('Void that sale', async () => JSON.stringify(await pt.voidTransactions([saleId])), { needsCustomer: true });
 

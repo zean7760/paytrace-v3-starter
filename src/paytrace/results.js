@@ -1,7 +1,7 @@
 // Reading transaction results: the approval gate and a log-friendly summary.
 
 // Response codes worth naming. Anything else: read response_message.
-const CODES = {
+const RESPONSE_CODES = {
   101: "approved",
   102: "declined",
   109: "voided",
@@ -17,9 +17,9 @@ function isApproved(result) {
   );
 }
 
-function describe(result) {
+function describeResult(result) {
   const code = result?.response_code;
-  return `${code ?? "?"} ${CODES[code] || result?.response_message || ""}`.trim();
+  return `${code ?? "?"} ${RESPONSE_CODES[code] || result?.response_message || ""}`.trim();
 }
 
-module.exports = { CODES, isApproved, describe };
+module.exports = { RESPONSE_CODES, isApproved, describeResult };

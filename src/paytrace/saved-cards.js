@@ -1,10 +1,10 @@
 // Vault: charge cards saved under a customer ID (repeat and recurring billing).
 
 const { config } = require("./config");
-const { request } = require("./client");
+const { apiRequest } = require("./client");
 
-function saleByCustomer({ customerId, amount, invoiceNumber }) {
-  return request("POST", `/v3/card/sale/customer/${customerId}`, {
+function chargeSavedCard({ customerId, amount, invoiceNumber }) {
+  return apiRequest("POST", `/v3/card/sale/customer/${customerId}`, {
     body: {
       merchant_id: config.merchantId,
       amount,
@@ -13,8 +13,8 @@ function saleByCustomer({ customerId, amount, invoiceNumber }) {
   });
 }
 
-function authorizeByCustomer({ customerId, amount, invoiceNumber }) {
-  return request("POST", `/v3/card/authorize/customer/${customerId}`, {
+function authorizeSavedCard({ customerId, amount, invoiceNumber }) {
+  return apiRequest("POST", `/v3/card/authorize/customer/${customerId}`, {
     body: {
       merchant_id: config.merchantId,
       amount,
@@ -23,4 +23,4 @@ function authorizeByCustomer({ customerId, amount, invoiceNumber }) {
   });
 }
 
-module.exports = { saleByCustomer, authorizeByCustomer };
+module.exports = { chargeSavedCard, authorizeSavedCard };

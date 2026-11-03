@@ -1,11 +1,11 @@
 // Protect.js: cards tokenized in the browser by PayTrace's iframe (lightest PCI scope).
 
 const { config } = require("./config");
-const { PayTraceError, request } = require("./client");
+const { PayTraceError, apiRequest } = require("./client");
 
 /** Short-lived (20 min) key the browser passes to PTPayment.setup(). */
 async function getProtectClientKey() {
-  const d = await request("POST", "/v3/payment-fields/token");
+  const d = await apiRequest("POST", "/v3/payment-fields/token");
   const key = d.clientKey || d.client_key || d.token;
   if (!key)
     throw new PayTraceError(
@@ -23,8 +23,8 @@ function protectFields({ hpfToken, encKey }) {
 }
 
 /** Charge a card tokenized by Protect.js. */
-function saleWithProtect({ hpfToken, encKey, amount, invoiceNumber }) {
-  return request("POST", "/v3/card/sale/pt-protect", {
+function chargeProtectCard({ hpfToken, encKey, amount, invoiceNumber }) {
+  return apiRequest("POST", "/v3/card/sale/pt-protect", {
     body: {
       merchant_id: config.merchantId,
       amount,
@@ -35,13 +35,13 @@ function saleWithProtect({ hpfToken, encKey, amount, invoiceNumber }) {
 }
 
 /** Charge a Protect.js card and save it to the vault in one call. Returns customer_id. */
-function saleWithProtectAndSaveCard({
+function chargeAndSaveProtectCard({
   hpfToken,
   encKey,
   amount,
   invoiceNumber,
 }) {
-  return request("POST", "/v3/card/sale/pt-protect/customer", {
+  return apiRequest("POST", "/v3/card/sale/pt-protect/customer", {
     body: {
       merchant_id: config.merchantId,
       amount,
@@ -53,6 +53,6 @@ function saleWithProtectAndSaveCard({
 
 module.exports = {
   getProtectClientKey,
-  saleWithProtect,
-  saleWithProtectAndSaveCard,
+  chargeProtectCard,
+  chargeAndSaveProtectCard,
 };

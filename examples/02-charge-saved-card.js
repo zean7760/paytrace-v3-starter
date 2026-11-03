@@ -9,7 +9,7 @@ if (!customerId) {
 }
 
 (async () => {
-  const result = await pt.saleByCustomer({ customerId, amount: 0.5, invoiceNumber: `INV-${Date.now()}` });
-  console.log(pt.isApproved(result) ? 'Approved' : 'Not approved', '→', pt.describe(result));
+  const result = await pt.chargeSavedCard({ customerId, amount: 0.5, invoiceNumber: `INV-${Date.now()}` });
+  console.log(pt.isApproved(result) ? 'Approved' : 'Not approved', '→', pt.describeResult(result));
   console.log('transaction_id:', result.transaction_id);
 })().catch((e) => { console.error(e.message, JSON.stringify(e.body ?? '', null, 2)); process.exit(1); });

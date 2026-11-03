@@ -38,7 +38,7 @@ app.post("/api/checkout", async (req, res) => {
 
   // Your own order ID, sent as invoice_number, lets you find this sale after a timeout.
   const invoiceNumber = `ORD-${Date.now()}`;
-  const charge = saveCard ? pt.saleWithProtectAndSaveCard : pt.saleWithProtect;
+  const charge = saveCard ? pt.chargeAndSaveProtectCard : pt.chargeProtectCard;
 
   try {
     const result = await charge({
@@ -48,7 +48,7 @@ app.post("/api/checkout", async (req, res) => {
       invoiceNumber,
     });
     const approved = pt.isApproved(result);
-    console.log(`[checkout] ${invoiceNumber} ${pt.describe(result)}`);
+    console.log(`[checkout] ${invoiceNumber} ${pt.describeResult(result)}`);
 
     // This is the gate: deliver or unlock ONLY when approved.
     res.json({
