@@ -37,7 +37,13 @@ Every other V3 call takes JSON. Send the token on each one, with your integrator
 
 | File | What it shows |
 | --- | --- |
-| `src/paytrace.js` | Token caching, headers, error handling, and one function per API call |
+| `src/paytrace/index.js` | The client's single entry point: `require('./paytrace')` |
+| `src/paytrace/client.js` | Token caching, headers, error handling (`PayTraceError`) |
+| `src/paytrace/results.js` | `isApproved` (the approval gate) and result summaries |
+| `src/paytrace/protect.js` | Protect.js client key and card charges |
+| `src/paytrace/saved-cards.js` | Charges against vaulted customers |
+| `src/paytrace/transactions.js` | Capture, void, refund, and transaction lookups |
+| `src/paytrace/config.js` | Settings read from `.env` |
 | `src/server.js` | A checkout backend: approval gate, timeout recovery, optional saved card |
 | `public/index.html` | Checkout markup: order summary and the Protect.js card fields |
 | `public/checkout.js` | Checkout logic and card-field styles; card data never touches your page or server |
