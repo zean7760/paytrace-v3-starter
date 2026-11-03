@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PayTrace V3 starter checkout</title>
+<link rel="stylesheet" href="styles.css">
+<!-- Sandbox. Production: https://protect.paytrace.com/js/protect.min.js -->
+<script src="https://protect.sandbox.paytrace.com/js/protect.min.js"></script>
+</head>
+<body>
+<main>
+  <h1>Starter checkout</h1>
+  <p class="sub">PayTrace V3 sandbox · test Visa 4012000098765439, exp 12/35, CSC 999</p>
+  <form id="pay" class="card">
+    <div class="order">
+      <div class="row"><span id="itemName">…</span><span id="itemPrice"></span></div>
+      <div class="row total"><span>Total</span><strong id="total">—</strong></div>
+    </div>
+    <div id="pt_hpf_form"><!-- Protect.js card fields render here, inside PayTrace's iframe --></div>
+    <label class="check"><input type="checkbox" id="saveCard"> Save card for future billing</label>
+    <button id="submit" type="submit" disabled>Loading…</button>
+    <div id="status" class="status" role="status"></div>
+    <details><summary>Raw response</summary><pre id="raw">—</pre></details>
+  </form>
+</main>
+<script src="checkout.js"></script>
+</body>
+</html>

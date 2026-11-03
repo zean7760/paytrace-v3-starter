@@ -1,0 +1,15 @@
+{
+  "name": "paytrace-v3-starter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Starter code for integrating the PayTrace V3 API (sandbox)",
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "smoke": "node --env-file=.env examples/smoke-test.js",
+    "example:token": "node --env-file=.env examples/01-get-token.js",
+    "example:vault": "node --env-file=.env examples/02-charge-saved-card.js",
+    "example:auth-capture": "node --env-file=.env examples/03-authorize-capture-void.js"
+  },
+  "engines": { "node": ">=20.6" },
+  "dependencies": { "express": "^4.19.2" }
+}
