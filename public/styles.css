@@ -25,6 +25,7 @@ button { font:inherit; width:100%; padding:.6rem .75rem; border-radius:8px; }
 @media (max-width: 420px) { #pt_hpf_form { height: 260px; } }
 button { margin-top:1rem; background:var(--ink); color:#fff; border:none; cursor:pointer; font-weight:600; }
 button:disabled { opacity:.5; cursor:default; }
+button.secondary { margin-top:.5rem; background:#fff; color:var(--ink); border:1px solid var(--line); }
 .status { margin-top:1rem; padding:.75rem; border-radius:8px; display:none; }
 .status.ok { display:block; background:#e8f5ef; color:var(--ok); }
 .status.bad { display:block; background:#fdecea; color:var(--bad); }

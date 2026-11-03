@@ -35,6 +35,21 @@ function show(ok, text, raw) {
   if (raw !== undefined) $('raw').textContent = JSON.stringify(raw, null, 2);
 }
 
+// Sandbox diagnostic. The server reports success or PayTrace's error, never the token.
+$('tokenCheck').addEventListener('click', async () => {
+  const b = $('tokenCheck');
+  b.disabled = true;
+  try {
+    const r = await fetch('/api/token-check');
+    const j = await r.json();
+    show(r.ok, r.ok ? j.message : `Token failed: ${j.error}`, j);
+  } catch (err) {
+    show(false, 'Could not reach the server', String(err));
+  } finally {
+    b.disabled = false;
+  }
+});
+
 // Display only: the server charges its own PRODUCTS price for this id, never a browser amount.
 let productId;
 

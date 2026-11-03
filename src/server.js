@@ -25,6 +25,18 @@ app.get("/api/client-key", async (_req, res) => {
   }
 });
 
+// Sandbox diagnostic: confirms the server can get a PayTrace token.
+// Reports success only; the token itself must never reach the browser.
+// A cached token (up to ~2h old) counts as success without a new PayTrace call.
+app.get("/api/token-check", async (_req, res) => {
+  try {
+    await pt.getAccessToken();
+    res.json({ ok: true, message: "PayTrace token OK" });
+  } catch (e) {
+    res.status(502).json({ ok: false, error: e.message, status: e.status, paytrace: e.body });
+  }
+});
+
 app.post("/api/checkout", async (req, res) => {
   const {
     hpf_token: hpfToken,

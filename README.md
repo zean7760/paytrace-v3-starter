@@ -15,6 +15,9 @@ Requires Node 20.6 or newer.
 
 Test card: Visa 4012000098765439, exp 12/35, CSC 999.
 The checkout charges one item, "Sample product" at $0.50. Change it in `PRODUCTS` in `src/server.js`.
+**Test PayTrace token** on the page checks that the server can authenticate
+(`GET /api/token-check`). It reports success or PayTrace's error, never the token itself.
+Remove that route before production: it's an unauthenticated diagnostic.
 
 ## First call without any code
 
