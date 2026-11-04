@@ -65,7 +65,7 @@ copy the customer ID it shows into `CUSTOMER_ID` in `.env`, then:
 ## How a checkout works
 
 1. The page asks your server for a Protect `clientKey` (valid 20 minutes).
-2. Your server gets it with its Bearer token (valid about 2 hours). Credentials stay on the server.
+2. Your server gets it with its Bearer token (valid 15 minutes). Credentials stay on the server.
 3. Protect.js renders PayTrace-hosted card fields, then returns a one-time token pair.
 4. Your server charges that token pair.
 5. **Deliver or unlock only when the response is approved.**

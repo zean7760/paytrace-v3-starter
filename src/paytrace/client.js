@@ -1,9 +1,12 @@
 /**
  * HTTP plumbing shared by every PayTrace call:
- *   - Fetch and cache the OAuth Bearer token (valid about 2 hours).
+ *   - Fetch and cache the OAuth Bearer token (valid 15 minutes).
  *   - Add the Authorization and X-Integrator-Id headers to every call.
  *   - Unwrap V3's { data: ... } envelope.
  *   - Turn HTTP errors (including 422 validation errors) into one error type.
+ *
+ * Uses the global fetch and AbortSignal.timeout, which need Node 18+. The project
+ * as a whole needs Node 20.6+ for --env-file (see "engines" in package.json).
  */
 
 const { config } = require("./config");
@@ -75,7 +78,8 @@ async function fetchAccessToken() {
   }
   cachedToken = {
     value: d.access_token,
-    expiresAt: Date.now() + Number(d.expires_in || 7200) * 1000,
+    // V3 sends expires_in: 900 (15 minutes); the fallback matches it.
+    expiresAt: Date.now() + Number(d.expires_in || 900) * 1000,
   };
   return cachedToken.value;
 }

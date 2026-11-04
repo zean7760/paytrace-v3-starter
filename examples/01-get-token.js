@@ -2,5 +2,5 @@
 const pt = require('../src/paytrace');
 
 pt.getAccessToken()
-  .then((t) => console.log(`Token OK (${t.slice(0, 12)}…). Cached for about 2 hours.`))
+  .then((t) => console.log(`Token OK (${t.slice(0, 12)}…). Cached for about 15 minutes.`))
   .catch((e) => { console.error(e.message, e.body ?? ''); process.exit(1); });
