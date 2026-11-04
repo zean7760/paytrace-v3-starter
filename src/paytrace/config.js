@@ -6,8 +6,6 @@ const config = {
   password: process.env.PT_PASSWORD,
   integratorId: process.env.PT_INTEGRATOR_ID, //request your integrator ID from PayTrace;
   merchantId: Number(process.env.PT_MERCHANT_ID),
-  protectTokenField: process.env.PT_PROTECT_TOKEN_FIELD || "hpf_token",
-  protectKeyField: process.env.PT_PROTECT_KEY_FIELD || "enc_key",
   timeoutMs: 30_000, // Authorizations take a few seconds; never use a short timeout.
 };
 

@@ -15,12 +15,8 @@ async function getProtectClientKey() {
   return key;
 }
 
-function protectFields({ hpfToken, encKey }) {
-  return {
-    [config.protectTokenField]: hpfToken,
-    [config.protectKeyField]: encKey,
-  };
-}
+// The token pair from PTPayment.process() goes in the sale body as hpf_token and
+// enc_key, the same names Protect.js returns (confirmed by approved sandbox sales).
 
 /** Charge a card tokenized by Protect.js. */
 function chargeProtectCard({ hpfToken, encKey, amount, invoiceNumber }) {
@@ -29,7 +25,8 @@ function chargeProtectCard({ hpfToken, encKey, amount, invoiceNumber }) {
       merchant_id: config.merchantId,
       amount,
       invoice_number: invoiceNumber,
-      ...protectFields({ hpfToken, encKey }),
+      hpf_token: hpfToken,
+      enc_key: encKey,
     },
   });
 }
@@ -46,7 +43,8 @@ function chargeAndSaveProtectCard({
       merchant_id: config.merchantId,
       amount,
       invoice_number: invoiceNumber,
-      ...protectFields({ hpfToken, encKey }),
+      hpf_token: hpfToken,
+      enc_key: encKey,
     },
   });
 }
