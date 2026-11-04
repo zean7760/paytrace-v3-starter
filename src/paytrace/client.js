@@ -23,11 +23,21 @@ class PayTraceError extends Error {
 // ---- Auth ------------------------------------------------------------------
 
 let cachedToken = null; // { value, expiresAt }
+// The token fetch in progress, shared so concurrent callers make one request, not one each.
+// Cleared when it settles, success or failure, so a failed fetch is retried by the next call.
+let tokenRequest = null;
 
 async function getAccessToken() {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 60_000)
     return cachedToken.value;
 
+  tokenRequest ??= fetchAccessToken().finally(() => {
+    tokenRequest = null;
+  });
+  return tokenRequest;
+}
+
+async function fetchAccessToken() {
   if (!config.username || !config.password) {
     throw new PayTraceError("PT_USERNAME and PT_PASSWORD must be set");
   }
