@@ -5,10 +5,20 @@ const btn = $('submit');
 
 // Protect.js field styles. The fields live in PayTrace's iframe, so styles.css
 // (including var(--...)) can't reach them; use literal values.
-// Groups: cc, exp, code (security code), body. Keys are snake_case, not CSS names.
+// Groups: cc, exp, code (security code), body. Keys are PayTrace's snake_case names,
+// not CSS; unknown keys are silently ignored. Full list (read from the iframe's code,
+// not documented by PayTrace, may change):
+//   input:  height width font_color font_size background_color border_color border_style
+//           input_font input_font_weight input_margin input_padding input_border_radius
+//           input_border_width
+//   label:  label_size label_color label_font label_font_weight label_margin label_padding
+//           label_border_style label_border_color label_border_radius label_border_width
+//           label_width
+//   field:  padding_bottom
 // Anything the keys can't express (e.g. :focus) goes in `raw`, a CSS string the
 // iframe injects verbatim. Field ids there: #credit_card, #expiration_month,
-// #expiration_year, #security_code.
+// #expiration_year, #security_code. Later changes: PTPayment.style({...}).
+// Label placement: PTPayment.theme('above the line' | 'horizontal' | 'below the line').
 const FIELD = {
   font_color: '#1b1d21', font_size: '16px', input_font: 'system-ui, sans-serif',
   border_color: '#dde0e6', border_style: 'solid', input_border_width: '1px',

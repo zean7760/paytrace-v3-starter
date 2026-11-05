@@ -1,8 +1,7 @@
 # PayTrace V3 starter
 
-Starter code for integrating the PayTrace V3 API: a reusable server-side client,
-a Protect.js checkout, and short scripts for the most common payment flows.
-Built for the sandbox; see "Going to production" before using it with real cards.
+A server-side PayTrace V3 client, a Protect.js checkout, and scripts for the common payment
+flows. Built for the sandbox; see "Going to production" before using real cards.
 
 ## Quickstart
 
@@ -13,11 +12,9 @@ Requires Node 20.6 or newer.
     npm run smoke            # checks credentials and the API calls
     npm start                # checkout at http://localhost:3000
 
-Test card: Visa 4012000098765439, exp 12/35, CSC 999.
-The checkout charges one item, "Sample product" at $0.50. Change it in `PRODUCTS` in `src/server.js`.
-**Test PayTrace token** on the page checks that the server can authenticate
-(`GET /api/token-check`). It reports success or PayTrace's error, never the token itself.
-Remove that route before production: it's an unauthenticated diagnostic.
+Test card: Visa 4012000098765439, exp 12/35, CSC 999. The checkout charges "Sample product"
+($0.50); change it in `PRODUCTS` in `src/server.js`. **Test PayTrace token** on the page
+checks that the server can authenticate.
 
 ## First call without any code
 
@@ -41,26 +38,15 @@ PayTrace publishes the full V3 API reference at https://api.sandbox.paytrace.com
 
 ## What's in here
 
-| File | What it shows |
+| Path | What it is |
 | --- | --- |
-| `src/paytrace/index.js` | The client's single entry point: `require('./paytrace')` |
-| `src/paytrace/client.js` | Token caching, headers, error handling (`PayTraceError`) |
-| `src/paytrace/results.js` | `isApproved` (the approval gate) and result summaries |
-| `src/paytrace/protect.js` | Protect.js client key, card charges, and saving cards without a charge |
-| `src/paytrace/saved-cards.js` | Charges against vaulted customers |
-| `src/paytrace/transactions.js` | Capture, void, refund, and transaction lookups |
-| `src/paytrace/config.js` | Settings read from `.env` |
-| `src/server.js` | A checkout backend: approval gate, timeout recovery, optional saved card |
-| `public/index.html` | Checkout markup: order summary and the Protect.js card fields |
-| `public/checkout.js` | Checkout logic and card-field styles; card data never touches your page or server |
-| `public/styles.css` | Page styles (not the card fields; see "Styling the card fields") |
-| `examples/01-get-token.js` | Confirms credentials work |
-| `examples/02-charge-saved-card.js` | Charges a vaulted card by customer ID (repeat and monthly billing) |
-| `examples/03-authorize-capture-void.js` | Hold now, capture on shipment, or void to cancel |
-| `examples/smoke-test.js` | Runs every flow against the sandbox and reports pass/fail |
+| `src/paytrace/` | The client: token caching, errors, and one function per API call. Copy it into your app. |
+| `src/server.js` | Demo checkout backend: approval gate and timeout recovery |
+| `public/` | Demo checkout page with the Protect.js card fields |
+| `examples/` | Token check, saved-card charge, authorize/capture/void, and a smoke test |
 
-To run the vault examples, complete one checkout with **Save card** ticked,
-copy the customer ID it shows into `CUSTOMER_ID` in `.env`, then:
+To run the saved-card examples, complete one checkout with **Save card** ticked, copy the
+customer ID it shows into `CUSTOMER_ID` in `.env`, then:
 
     npm run example:vault
     npm run example:auth-capture          # or: npm run example:auth-capture -- void
@@ -73,29 +59,13 @@ copy the customer ID it shows into `CUSTOMER_ID` in `.env`, then:
 4. Your server charges that token pair.
 5. **Deliver or unlock only when the response is approved.**
 
-After step 3 the card fields are replaced by "Payment method: Visa ending in 5439". That is
-Protect.js by design: each token pair is single-use. The page hides Pay after an approval and
-calls `PTPayment.reset()` for fresh fields only when the card was certainly not charged.
+After step 3 the fields show the masked card by design; `PTPayment.reset()` brings them back.
 
 ## Styling the card fields
 
-The card fields render inside PayTrace's iframe, so `styles.css` can't reach them. Style them
-through `PT_STYLES` in `public/checkout.js`, which is passed to `PTPayment.setup()`:
-
-- Groups: `cc`, `exp`, `code` (security code), `body`.
-- Keys are PayTrace's snake_case names, not CSS: `height`, `width`, `font_color`, `font_size`,
-  `input_font`, `border_color`, `border_style`, `input_border_width`, `input_border_radius`,
-  `input_padding`, `background_color`, `label_color`, `label_size`, `label_font`,
-  `label_font_weight`, `label_margin`, `padding_bottom`. Unknown keys are silently ignored.
-- `raw` is a CSS string injected into the iframe as-is, for anything the keys can't express
-  (`:focus`, `box-sizing`, select arrows). Field ids: `#credit_card`, `#expiration_month`,
-  `#expiration_year`, `#security_code`.
-- `PTPayment.style({...})` changes styles later; `PTPayment.theme(...)` sets label placement
-  (`'above the line'`, `'horizontal'`, `'below the line'`).
-- **The iframe never resizes to fit its content.** Its height comes from `#pt_hpf_form` in
-  `styles.css`; raise it whenever you change field sizes or spacing.
-
-These key names were read from the sandbox iframe's code, not from PayTrace's docs, and may change.
+The fields render inside PayTrace's iframe, so `styles.css` can't reach them. Style them with
+`PT_STYLES` in `public/checkout.js`; its comment lists every supported key. **The iframe never
+resizes to fit its content:** raise `#pt_hpf_form`'s height in `styles.css` when fields grow.
 
 ## Patterns worth copying
 
@@ -112,5 +82,6 @@ These key names were read from the sandbox iframe's code, not from PayTrace's do
   `https://protect.paytrace.com/js/protect.min.js`.
 - Store credentials in a secrets manager, not a `.env` file.
 - Serve the checkout over HTTPS.
+- Remove the `/api/token-check` route: it's an unauthenticated diagnostic.
 - Persist `transaction_id` (or `transaction_uuid` with the `X-Permalinks: true` header) with each order.
 - Decide what to do with address and CVV mismatches before shipping high-value orders.
