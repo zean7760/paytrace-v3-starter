@@ -42,25 +42,26 @@ function getTransaction(transactionId) {
   });
 }
 
-function listVoidableTransactions({ searchTerm, orderId, limit = 50 } = {}) {
+function listVoidableTransactions({ searchTerm, limit = 50 } = {}) {
   return apiRequest("GET", `/v3/card/transactions/voidable/${config.merchantId}`, {
-    query: { search_term: searchTerm, order_id: orderId, limit },
+    query: { search_term: searchTerm, limit },
   });
 }
 
-function listCapturableTransactions({ searchTerm, orderId, limit = 50 } = {}) {
+function listCapturableTransactions({ searchTerm, limit = 50 } = {}) {
   return apiRequest(
     "GET",
     `/v3/card/transactions/capturable/${config.merchantId}`,
     {
-      query: { search_term: searchTerm, order_id: orderId, limit },
+      query: { search_term: searchTerm, limit },
     },
   );
 }
 
 /**
  * After a timeout, look for an unsettled transaction carrying this invoice number.
- * Confirm with PayTrace which filter (search_term or order_id) matches invoice_number.
+ * search_term finds invoice_number (verified in sandbox) but returns loose matches too
+ * (8 rows for one invoice in testing), so the exact comparison below is required.
  */
 async function findUnsettledByInvoice(invoiceNumber) {
   const lists = await Promise.all([
