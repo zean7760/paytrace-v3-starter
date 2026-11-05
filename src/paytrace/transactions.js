@@ -5,17 +5,23 @@ const { apiRequest } = require("./client");
 
 // ---- Follow-up actions ---------------------------------------------------------
 
-/** Turn authorizations into sales. Omitting an amount captures the authorized amount. */
+// Batch endpoints take { merchant_id, batch_items: [{ transaction_id }] } (V3 OpenAPI spec).
+const batchBody = (transactionIds) => ({
+  merchant_id: config.merchantId,
+  batch_items: transactionIds.map((id) => ({ transaction_id: String(id) })),
+});
+
+/** Turn authorizations into sales, each for its full authorized amount. */
 function captureAuthorizations(transactionIds) {
   return apiRequest("POST", "/v3/card/batch/capture", {
-    body: { transaction_ids: transactionIds.map(String) },
+    body: batchBody(transactionIds),
   });
 }
 
 /** Cancel transactions that haven't settled yet. After settlement, refund instead. */
 function voidTransactions(transactionIds) {
   return apiRequest("POST", "/v3/card/batch/void", {
-    body: { transaction_ids: transactionIds.map(String) },
+    body: batchBody(transactionIds),
   });
 }
 
