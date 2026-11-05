@@ -36,6 +36,9 @@ Every other V3 call takes JSON. Send the token on each one, with your integrator
     Authorization: Bearer <access_token>
     X-Integrator-Id: <integrator_id>
 
+PayTrace publishes the full V3 API reference at https://api.sandbox.paytrace.com/v3/redoc
+(machine-readable: `/v3/openapi.json`). Check request bodies and paths there.
+
 ## What's in here
 
 | File | What it shows |
@@ -43,7 +46,7 @@ Every other V3 call takes JSON. Send the token on each one, with your integrator
 | `src/paytrace/index.js` | The client's single entry point: `require('./paytrace')` |
 | `src/paytrace/client.js` | Token caching, headers, error handling (`PayTraceError`) |
 | `src/paytrace/results.js` | `isApproved` (the approval gate) and result summaries |
-| `src/paytrace/protect.js` | Protect.js client key and card charges |
+| `src/paytrace/protect.js` | Protect.js client key, card charges, and saving cards without a charge |
 | `src/paytrace/saved-cards.js` | Charges against vaulted customers |
 | `src/paytrace/transactions.js` | Capture, void, refund, and transaction lookups |
 | `src/paytrace/config.js` | Settings read from `.env` |
@@ -71,7 +74,8 @@ copy the customer ID it shows into `CUSTOMER_ID` in `.env`, then:
 5. **Deliver or unlock only when the response is approved.**
 
 After step 3 the card fields are replaced by "Payment method: Visa ending in 5439". That is
-Protect.js by design: each token pair is single-use. `PTPayment.reset()` brings the empty fields back.
+Protect.js by design: each token pair is single-use. The page hides Pay after an approval and
+calls `PTPayment.reset()` for fresh fields only when the card was certainly not charged.
 
 ## Styling the card fields
 
@@ -101,29 +105,6 @@ These key names were read from the sandbox iframe's code, not from PayTrace's do
   so the server searches unsettled transactions for that invoice number before retrying.
 - **Long timeouts.** Authorizations take a few seconds; the client waits 30 seconds.
 - **Void before settlement, refund after.**
-
-## Not yet verified against the live API
-
-Confirm these with `npm run smoke` and a sandbox checkout:
-
-- Whether the transaction list filters (`search_term`, `order_id`) match `invoice_number`.
-- The refund-by-transaction path.
-- How to trigger a decline in the V3 sandbox. $0.20 (documented as a decline amount) and
-  $0.29 were both approved when tested, so the decline path is untested.
-- Whether declines come back as HTTP 200 with code 102 or as an HTTP error.
-- An endpoint to save a card without charging it. Today a card is saved only together with a
-  sale (`/v3/card/sale/pt-protect/customer`).
-
-Verified in the sandbox: the token request, the Protect `clientKey`, and Protect sales with the
-default body fields `hpf_token` and `enc_key`.
-
-## Known gaps
-
-- After a payment the Pay button re-enables while the card fields show the masked card.
-  Call `PTPayment.reset()` after a decline and hide the button after an approval.
-- Saved cards can be charged only from `examples/02-charge-saved-card.js`. A UI for it needs
-  user accounts, so the server looks up the customer's own `customer_id`; never accept one
-  from the browser.
 
 ## Going to production
 
