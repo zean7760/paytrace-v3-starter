@@ -58,6 +58,9 @@ app.post("/api/checkout", async (req, res) => {
       encKey,
       amount: product.amount,
       invoiceNumber,
+      // Used only when saving the card. Example value: replace with your own reference
+      // (e.g. your user ID) so the saved card maps back to its owner.
+      customerLabel: "Example customer",
     });
     const approved = pt.isApproved(result);
     console.log(`[checkout] ${invoiceNumber} ${pt.describeResult(result)}`);

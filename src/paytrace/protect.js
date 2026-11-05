@@ -31,18 +31,24 @@ function chargeProtectCard({ hpfToken, encKey, amount, invoiceNumber }) {
   });
 }
 
-/** Charge a Protect.js card and save it to the vault in one call. Returns customer_id. */
+/**
+ * Charge a Protect.js card and save it to the vault in one call. Returns customer_id.
+ * customerLabel is required by PayTrace (422 without it): a reference back to your
+ * own records, such as your user ID, shown on the saved customer in PayTrace.
+ */
 function chargeAndSaveProtectCard({
   hpfToken,
   encKey,
   amount,
   invoiceNumber,
+  customerLabel,
 }) {
   return apiRequest("POST", "/v3/card/sale/pt-protect/customer", {
     body: {
       merchant_id: config.merchantId,
       amount,
       invoice_number: invoiceNumber,
+      customer_label: customerLabel,
       hpf_token: hpfToken,
       enc_key: encKey,
     },
