@@ -55,7 +55,23 @@ function chargeAndSaveProtectCard({
   });
 }
 
+/**
+ * Save a Protect.js card to the vault without charging it. Returns customer_id.
+ * customerLabel must be unique among saved customers (PayTrace rejects a repeat).
+ * No merchant_id: the spec's body has none; PayTrace takes it from the token.
+ */
+function saveProtectCard({ hpfToken, encKey, customerLabel }) {
+  return apiRequest("POST", "/v3/customer/create/pt-protect", {
+    body: {
+      customer_label: customerLabel,
+      hpf_token: hpfToken,
+      enc_key: encKey,
+    },
+  });
+}
+
 module.exports = {
+  saveProtectCard,
   getProtectClientKey,
   chargeProtectCard,
   chargeAndSaveProtectCard,
