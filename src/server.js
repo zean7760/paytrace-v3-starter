@@ -58,9 +58,10 @@ app.post("/api/checkout", async (req, res) => {
       encKey,
       amount: product.amount,
       invoiceNumber,
-      // Used only when saving the card. Example value: replace with your own reference
-      // (e.g. your user ID) so the saved card maps back to its owner.
-      customerLabel: "Example customer",
+      // Used only when saving the card. PayTrace requires a label no other saved customer
+      // has; a repeat label charges the card but skips saving it (code 167). Example
+      // value: replace with your own unique reference, e.g. your user ID.
+      customerLabel: `Example customer ${invoiceNumber}`,
     });
     const approved = pt.isApproved(result);
     console.log(`[checkout] ${invoiceNumber} ${pt.describeResult(result)}`);
