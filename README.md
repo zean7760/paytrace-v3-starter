@@ -8,7 +8,7 @@ Built for the sandbox; see "Going to production" before using it with real cards
 
 Requires Node 20.6 or newer.
 
-    cp .env.example .env     # add your sandbox credentials
+    cp .env.example .env     # add PT_BASE_URL and your sandbox credentials
     npm install
     npm run smoke            # checks credentials and the API calls
     npm start                # checkout at http://localhost:3000
