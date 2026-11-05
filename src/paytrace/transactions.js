@@ -25,11 +25,13 @@ function voidTransactions(transactionIds) {
   });
 }
 
-/** Refund a settled transaction. Path follows the V3 pattern; confirm it in the redoc. */
+/** Refund a settled transaction, in full or in part (amount). Before settlement, void instead. */
 function refundTransaction({ transactionId, amount }) {
-  return apiRequest("POST", `/v3/card/refund/by-transaction/${transactionId}`, {
-    body: { merchant_id: config.merchantId, amount },
-  });
+  return apiRequest(
+    "POST",
+    `/v3/card/refund-auth/by-transaction/${transactionId}`,
+    { body: { merchant_id: config.merchantId, amount } },
+  );
 }
 
 // ---- Lookups --------------------------------------------------------------------
