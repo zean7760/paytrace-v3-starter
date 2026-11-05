@@ -1,7 +1,7 @@
 // Settings read once from the environment at startup.
 
 const config = {
-  baseUrl: process.env.PT_BASE_URL || "https://api.sandbox.paytrace.com",
+  baseUrl: process.env.PT_BASE_URL,
   username: process.env.PT_USERNAME,
   password: process.env.PT_PASSWORD,
   integratorId: process.env.PT_INTEGRATOR_ID, //request your integrator ID from PayTrace;
