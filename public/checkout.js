@@ -87,24 +87,55 @@ $('pay').addEventListener('submit', (e) => {
       }
       return show(false, 'Please check the card details', errors);
     }
-    PTPayment.process()
-      .then(async (r) => {
-        const m = r.message || r;
-        // 4. Send only the token pair and the product to our server.
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ hpf_token: m.hpf_token, enc_key: m.enc_key,
-                                 productId, saveCard: $('saveCard').checked }),
-        });
-        const out = await res.json();
-        // 5. Only the server's "approved" decides what the customer gets.
-        if (out.approved) show(true, `Approved · invoice ${out.invoiceNumber}` + (out.customerId ? ` · saved as customer ${out.customerId}` : ''), out);
-        else show(false, out.message || out.error || 'Payment failed', out);
-      })
-      .catch((err) => show(false, 'Could not tokenize the card. Reload if this page has been open over 20 minutes.', err))
-      .finally(() => { btn.disabled = false; btn.textContent = 'Pay'; });
+    pay();
   });
 });
+
+// After process() the iframe shows the masked card and its token pair is single-use.
+// Re-enable Pay (with fresh fields) only when the card was certainly not charged.
+function payAgain() {
+  PTPayment.reset();
+  btn.disabled = false;
+  btn.textContent = 'Pay';
+}
+
+async function pay() {
+  let m;
+  try {
+    const r = await PTPayment.process();
+    m = r.message || r;
+  } catch (err) {
+    show(false, 'Could not tokenize the card. Reload if this page has been open over 20 minutes.', err);
+    return payAgain(); // nothing was sent to PayTrace
+  }
+
+  let res, out;
+  try {
+    // 4. Send only the token pair and the product to our server.
+    res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hpf_token: m.hpf_token, enc_key: m.enc_key,
+                             productId, saveCard: $('saveCard').checked }),
+    });
+    out = await res.json();
+  } catch (err) {
+    // The request may have reached the server and charged the card: don't invite a retry.
+    return show(false, 'No response from the server. Check your order before paying again.', String(err));
+  }
+
+  // 5. Only the server's "approved" decides what the customer gets.
+  if (out.approved) {
+    show(true, `Approved · invoice ${out.invoiceNumber}` + (out.customerId ? ` · saved as customer ${out.customerId}` : ''), out);
+    btn.hidden = true; // paid: no second charge from this page
+    return;
+  }
+  if (res.status === 504) {
+    // Server says the outcome is unknown (PayTrace timeout): same rule, no retry.
+    return show(false, out.error || 'Payment status unknown. Check your order before paying again.', out);
+  }
+  show(false, out.message || out.error || 'Payment failed', out);
+  payAgain(); // declined or rejected: the card was not charged
+}
 
 init().catch((err) => show(false, 'Setup failed: ' + err.message));
